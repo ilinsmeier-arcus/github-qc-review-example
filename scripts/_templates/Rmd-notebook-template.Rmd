@@ -1,0 +1,50 @@
+---
+title: "Analysis Notebook"
+author: "<Scientist-Name>"
+date: "`r Sys.Date()`"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
+  html_document:
+    code_download: yes
+    toc: yes
+    toc_depth: 2
+    theme: yeti
+    highlight: pygments
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+### load dependent R packages --------------------------------------------------
+pacman::p_load(readr, dplyr, tidyr, tidylog)
+crayon <- function(x) cat(crayon::magenta$bold(x), sep = "\n")
+options("tidylog.display" = list(crayon))
+
+### set project root directory & source custom R functions for analysis --------
+withr::with_dir(this.path::this.dir(), {
+  proj_root_pth <- usethis::proj_get()
+  here::i_am(fs::path_rel(this.path::this.path(), start = proj_root_pth))
+})
+purrr::walk(list.files(here::here("R"), "(?i).*\\.R$", full.names = TRUE), source)
+```
+
+## Analysis
+
+<!-- insert code for current analysis in chunk(s) below -->
+
+```{r, analysis-code}
+
+
+```
+
+
+## R session information
+
+```{r, session-info, include=TRUE, echo=TRUE, results='markup'}
+devtools::session_info()
+```
+

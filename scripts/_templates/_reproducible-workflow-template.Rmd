@@ -1,0 +1,87 @@
+---
+title:  "Reproducible Workflow Script"
+author: "<Project Owner>"
+date:   "<YYYY-MM-DD>"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+### load dependent R packages --------------------------------------------------
+pacman::p_load(tidyr, dplyr)
+
+### set project root directory & source custom R functions for analysis --------
+withr::with_dir(this.path::this.dir(), {
+  proj_root_pth <- usethis::proj_get()
+  here::i_am(fs::path_rel(this.path::this.path(), start = proj_root_pth))
+})
+purrr::walk(list.files(here::here("R"), "(?i)\\.R$", full.names = TRUE), source)
+```
+
+
+# Reproducible Workflow Script:  `<<< replace with project description >>>`
+Approximate overall run time:  `<<< replace with approximate run time >>>`
+
+```{r, start-time}
+## start timing script execution
+start_time <- Sys.time() |> print() ## print start time
+```
+
+
+## Rerun Primary Analysis Steps to Reproduce Key Output Files
+
+```{r, reproduce-results}
+## project setup 
+log_script_exec(here::here("scripts/install-packages.R"))
+log_script_exec(here::here("scripts/project-setup.R"))
+
+## ADD ANALYSIS STEPS BELOW
+##  * NOTE: replace example steps below with the paths to your analysis scripts
+
+## Data assembly
+log_script_exec(here::here("scripts/data-assembly.R"))
+
+## EDA plots & tables
+log_script_exec(here::here("scripts/EDA-plots.R"))
+log_script_exec(here::here("scripts/EDA-tables.R"))
+
+## NONMEM modeling
+log_script_exec(here::here("scripts/run-NONMEM-models.R"))
+log_script_exec(here::here("scripts/post-process-NONMEM-models.R"))
+
+## Simulations
+log_script_exec(here::here("scripts/run-simulations.R"))
+log_script_exec(here::here("scripts/post-process-sims.R"))
+
+## End of script message
+cat("\n\n  >>>  REPRODUCTION COMPLETE!  <<<  \n\n\n")
+```
+
+
+```{r, delete-rplots-pdf}
+## delete "Rplots.pdf" if it exists in the project root directory
+## - produced by {ggplot2} bug: https://github.com/tidyverse/ggplot2/issues/2787
+rplots_path <- here::here("Rplots.pdf")
+if (file.exists(rplots_path)) {
+  file.remove(rplots_path)
+}
+```
+
+
+## R session information
+
+```{r, session-info, include=TRUE, echo=TRUE, results='markup'}
+devtools::session_info()
+```
+
+
+## Workflow Execution Time
+
+```{r, finish-time}
+## finish timing script execution
+end_time <- Sys.time() |> print() ## print end time
+elapsed_time <- (end_time - start_time) |> print() ## print total run time
+```
+
