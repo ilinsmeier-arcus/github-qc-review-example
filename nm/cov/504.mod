@@ -1,3 +1,10 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  
+;;;  Source reference for example NONMEM model and input dataset "data/501.csv":
+;;;    1.  Bauer, R.J. (2019). NONMEM Tutorial Part I: Description of Commands and Options, With Simple Examples of Population Analysis. CPT Pharmacometrics Syst. Pharmacol., 8, 525–537. doi: https://doi.org/10.1002/psp4.12404
+;;;  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 $PROB Phase IIa Study, One Compartment Model 504.ctl
 
 ; Place column names of data file here:
