@@ -1,0 +1,161 @@
+---
+title:  "Model Parameter Estimates"
+author: "Ian Linsmeier"
+date:   "2025/10/14"
+output: html_document
+---
+
+<!--
+###############################################################################|
+## Extract and Format NONMEM Model Parameter Estimates ------------------------|
+###############################################################################|
+##
+## Description: This R Markdown script extracts parameter estimates from the
+## NONMEM model output files using the xpose package and formats them into
+## publication-ready summary tables with confidence intervals.
+##
+## Inputs:
+##   - data/501.csv                       # Input popPK dataset (NONMEM format)
+##   - nm/cov/504.mod                     # NONMEM model file
+##   - nm/cov/504.tab                     # NONMEM output table
+##   - nm/cov/504.ext                     # Parameter estimates
+##
+## Outputs (in "tables/cov/504/" directory):
+##   - 504_parameter-estimates_all-data.csv      # Comprehensive parameter table
+##   - 504_parameter-estimates_report.csv        # Report-ready parameter table
+##
+###############################################################################|
+-->
+
+```{r config}
+## specify R-script configuration
+mod_rela <- "nm/cov/504.mod"      ## path to target model run
+tabl_ext <- "tab"                 ## file extension of model output table
+csv_rela <- "data/501.csv"
+out_tabl <- "tables/{mod_step}/{mod_name}"
+n_digits <- 3  ## specify significant digits for model parameter table
+
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+### load dependent R packages --------------------------------------------------
+pacman::p_load(xpose, purrr, tidyr, dplyr, tidylog)
+
+### set project root directory & source custom R functions for analysis --------
+withr::with_dir(this.path::this.dir(), {
+  proj_root_pth <- usethis::proj_get()
+  here::i_am(fs::path_rel(this.path::this.path(), start = proj_root_pth))
+})
+purrr::walk(list.files(here::here("R"), "(?i)\\.R$", full.names = TRUE), source)
+```
+
+
+```{r}
+###############################################################################|
+## define functions ------------------------------------------------------------
+###############################################################################|
+
+file_stem <- function(paths) {
+  tools::file_path_sans_ext(basename(paths))
+}
+
+format_number <- function(num, digits = 3, format = "fg", flag = "#", ...) {
+  ## https://stackoverflow.com/a/3443955
+  formatC(signif(num, digits = digits), digits = digits, format = format, flag = flag, ...)
+}
+
+###############################################################################|
+## specify file paths ----------------------------------------------------------
+###############################################################################|
+
+## expand relative path into absolute/full path
+mod_path <- here::here(mod_rela) %>% print()
+tab_path <- fs::path_ext_set(mod_path, tabl_ext) %>% print()
+csv_path <- here::here(csv_rela) %>% print()
+
+## extract model path components for constructing descriptive output paths
+mod_name <- file_stem(mod_path) %>% print()
+mod_step <- basename(dirname(mod_path)) %>% print()
+
+## define output paths
+out_tabl_path <- here::here(glue::glue(out_tabl)) %>% build_path()
+
+
+###############################################################################|
+## read model input data -------------------------------------------------------
+###############################################################################|
+
+mod_data <- readr::read_csv(csv_path, skip = 1) %>% print()
+
+###############################################################################|
+## read model output files -----------------------------------------------------
+###############################################################################|
+
+## read model output table
+mod_tab <- readr::read_csv(tab_path, skip = 1) %>% print()
+
+## create xpose database object from target model files
+mod_xpdb <- xpose::xpose_data(
+  file = basename(mod_path), 
+  dir = dirname(mod_path)
+)
+
+
+###############################################################################|
+## model parameter estimates table ---------------------------------------------
+###############################################################################|
+
+## extract model parameter estimates and format as output table
+mod_prms_all <- mod_xpdb %>% 
+  xpose::get_prm() %>% 
+  mutate(
+    Z = 1.645,                 ## Z-score for 95% confidence interval
+    CI95_LO = format_number(value - Z * se, n_digits),
+    CI95_UP = format_number(value + Z * se, n_digits),
+    CI95 = glue::glue("[{CI95_LO}, {CI95_UP}]"),
+    transform = as.character(xpose::get_prm_transformation_formulas(name)),
+    type_idx = factor(type, levels = c("the", "ome", "sig")),
+    label = case_when(
+      ## apply missing OMEGA labels (that `xpose::get_prm()` failed to parse)
+      type %in% "ome" & diagonal %in% TRUE  ~ "[P]",  ## proportional/exponential error model
+      type %in% "ome" & diagonal %in% FALSE ~ "[F]",  ## off-diagonal covariance
+      TRUE ~ label,
+    ),
+  ) %>% 
+  mutate(
+    num = as.numeric(if_else(is.na(n), as.character(m), paste0(m, ".", n))),
+    .after = type
+  ) %>% 
+  arrange(type_idx, m, n) %>%
+  print()
+
+
+
+## export comprehensive table of model parameter estimates (all columns)
+prm_tbl_all_csv <- glue::glue("{mod_name}_parameter-estimates_all-data.csv")
+prm_tbl_all_pth <- here::here(out_tabl_path, prm_tbl_all_csv) %>% build_path()
+readr::write_csv(mod_prms_all, prm_tbl_all_pth)
+
+
+## drop extraneous columns before exporting report-ready table to csv 
+mod_prms_rpt <- mod_prms_all %>% 
+  filter(!fixed) %>%
+  mutate(
+    value = format_number(value, n_digits),
+    se    = format_number(se,    n_digits),
+    rse   = format_number(rse,   n_digits),
+  ) %>% 
+  select(-c(type_idx, fixed, diagonal, m, n, Z, CI95_LO, CI95_UP)) %>%
+  print()
+
+
+## export report-ready table of model parameter estimates
+prm_tbl_rpt_csv <- glue::glue("{mod_name}_parameter-estimates_report.csv")
+prm_tbl_rpt_pth <- here::here(out_tabl_path, prm_tbl_rpt_csv) %>% build_path()
+readr::write_csv(mod_prms_rpt, prm_tbl_rpt_pth)
+```
+
