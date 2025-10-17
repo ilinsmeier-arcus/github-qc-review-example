@@ -213,7 +213,7 @@ model_diagnostic_plots <- function(
                       values = c(1.25, NA, NA)
     ) +
     labs(
-      x = "Time after first dose (weeks)",
+      x = "Time after first dose (hours)",
       y = .yname
     ) +
     ylim(c(0, (ymax*1.1))) +
@@ -421,3 +421,8 @@ purrr::walk(
     plot_dir = out_plot_path
   )
 )
+
+
+
+## QC Requested on 2025-10-17
+

@@ -85,7 +85,7 @@ pk_data <- pk_data_raw %>%
     LOGDV = ifelse(DV > 0, log(DV), NA), 
     
     ## Sex as factor with labels
-    SEX_LABEL = factor(SEX, levels = c(1, 2), labels = c("Male", "Female"))
+    SEX_LABEL = factor(SEX, levels = c(0, 1), labels = c("Male", "Female"))
   )
 
 
@@ -405,4 +405,9 @@ missing_data <- pk_data %>%
   arrange(desc(Missing_Count))
 
 readr::write_csv(missing_data, here::here(out_tabl_path, "missing_data_summary.csv"))
+
+
+
+
+## QC Requested on 2025-10-17
 
