@@ -113,7 +113,7 @@ mod_xpdb <- xpose::xpose_data(
 mod_prms_all <- mod_xpdb %>% 
   xpose::get_prm() %>% 
   mutate(
-    Z = 1.645,                 ## Z-score for 95% confidence interval
+    Z = 1.96,                 ## Z-score for 95% confidence interval
     CI95_LO = format_number(value - Z * se, n_digits),
     CI95_UP = format_number(value + Z * se, n_digits),
     CI95 = glue::glue("[{CI95_LO}, {CI95_UP}]"),

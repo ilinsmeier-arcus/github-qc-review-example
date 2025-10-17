@@ -85,7 +85,7 @@ pk_data <- pk_data_raw %>%
     LOGDV = ifelse(DV > 0, log(DV), NA), 
     
     ## Sex as factor with labels
-    SEX_LABEL = factor(SEX, levels = c(1, 2), labels = c("Male", "Female"))
+    SEX_LABEL = factor(SEX, levels = c(0, 1), labels = c("Male", "Female"))
   )
 
 

@@ -213,7 +213,7 @@ model_diagnostic_plots <- function(
                       values = c(1.25, NA, NA)
     ) +
     labs(
-      x = "Time after first dose (weeks)",
+      x = "Time after first dose (hours)",
       y = .yname
     ) +
     ylim(c(0, (ymax*1.1))) +
