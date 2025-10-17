@@ -89,8 +89,16 @@ copy_as_txt <- function(paths) {
 
 #' Execute NONMEM model runs via PsN from RStudio
 #'
-#' @param mod_dir Path to a directory containing NONMEM model files (character vector, length 1).
-#' @param mod_files Name of one or more model files (".mod") in the `mod_dir` directory (character vector, length >= 1).
+#' @param mod_dir Path to a directory containing NONMEM model files (character
+#'   vector, length 1).
+#' @param mod_files Name of one or more model files (".mod") in the `mod_dir`
+#'   directory (character vector, length >= 1).
+#' @param cmd_fn Name of the OS-specific function for system calls (Windows =
+#'   `shell()`; Unix = `system()`)
+#' @param psn_bin_path Path to PsN utilities installation directory containing
+#'   executable files for each PsN tool (character vector, length 1). The
+#'   default value is provided by the `psn_path()` function, which attempts to
+#'   automatically locate this directory path on your machine.
 #'
 #' @return Outputs NONMEM messages to console.
 #' @export
@@ -102,31 +110,51 @@ copy_as_txt <- function(paths) {
 #'
 #' ## execute multiple model runs in "nm/base" folder
 #' psn_execute(mod_dir = here::here("nm/base"), mod_files = c("run01.mod", "run02.mod", "run03.mod"))
-#'
-psn_execute <- function(mod_dir, mod_files) {
-  psn_bin_path <- psn_path()
+#' 
+psn_execute <- function(
+    mod_dir, mod_files, psn_bin_path = psn_path(), cmd_fn = get_os_cmd()
+) {
   psn_inst_path <- dirname(psn_bin_path)
   mod_files_str <- paste(mod_files, sep = "", collapse = " ")
-  psn_exec_cmd <- glue::glue("Call {psn_bin_path}/execute -model_dir_name {mod_files_str}")
-  withr::with_dir(mod_dir, shell(psn_exec_cmd))
+  psn_exec_cmd <- glue::glue("{psn_bin_path}/execute -model_dir_name {mod_files_str}")
+  withr::with_dir(mod_dir, cmd_fn(psn_exec_cmd))
 }
 
 
 #' `psn_path()` finds the location of the most recent PsN installation.
 #' @keywords internal
-psn_path <- function(search_str = NULL, psn_version = NULL) {
+psn_path <- function(
+    search_str = NULL, psn_version = NULL, cmd_fn = get_os_cmd()
+) {
 
   ## for assigning default function arguments (rhs) if input argument is NULL
   `%||%` <- function(lhs, rhs) if (!is.null(lhs)) invisible(lhs) else invisible(rhs)
 
-  psn_version <- psn_version %||% shell("psn --version", intern = TRUE)
+  ## determine PsN version and PATH search string
+  psn_version <- psn_version %||% cmd_fn("psn -version", intern = TRUE)
   search_str <- search_str %||% gsub("^\\s*(PsN)\\s+version:\\s+((\\d+\\.?)+)$", "\\1-\\2", psn_version)
-  path_env_vars <- shell("echo %Path%", intern = TRUE)
-  env_path_split <- fs::path_norm(strsplit(path_env_vars, ";")[[1]])
+  
+  ## assign OS-dependent values
+  cur_os <- .Platform$OS.type
+  path_cmd <- ifelse(cur_os %in% "windows", "echo %Path%", "echo $PATH")
+  path_sep <- ifelse(cur_os %in% "windows", ";", ":")
+  
+  ## parse string returned by PATH environment variable to search for PsN path
+  path_env_vars <- cmd_fn(path_cmd, intern = TRUE)
+  env_path_split <- fs::path_norm(strsplit(path_env_vars, path_sep)[[1]])
   psn_path <- env_path_split[stringr::str_detect(env_path_split, search_str)]
 
-  ## try to select most recent PsN installation if more than 1 version on PATH (MAY NEED TWEAKING)
+  ## try to select most recent PsN installation if more than 1 version on PATH
   rev(sort(psn_path))[1]
+}
+
+
+#' `get_os_cmd()` returns the OS-specific function for system calls.
+#' @keywords internal
+get_os_cmd <- function() {
+  ## Windows = `shell()`
+  ## Unix    = `system()`
+  ifelse(.Platform$OS.type %in% "windows", shell, system)
 }
 
 
@@ -198,7 +226,6 @@ source_rmd <- function(path) {
 #' log_script_exec(here::here("scripts/plot-model-GOF.R"))
 #'
 log_script_exec <- function(path, quiet = FALSE) {
-  ## TODO: remove `quiet` argument from function (???)
   log_dir <- file.path(dirname(path), "logs")
   if (!dir.exists(log_dir)) dir.create(log_dir, recursive = TRUE)
   encoding <- getOption("encoding")
@@ -254,20 +281,6 @@ source_script <- function(path) {
   cmdargs = c("--slave", "--no-save", "--no-restore"),
   show = TRUE, spinner = FALSE)
   return(script_res)
-}
-
-
-.get_default_encoding <- function() {
-  ## TODO: consider removing this function (NOT CURRENTLY USED!!!)
-  ## TODO: consider removing this function (NOT CURRENTLY USED!!!)
-  ## TODO: consider removing this function (NOT CURRENTLY USED!!!)
-  ## TODO: consider removing this function (NOT CURRENTLY USED!!!)
-  ## TODO: consider removing this function (NOT CURRENTLY USED!!!)
-  purrr::pluck(
-    jsonlite::read_json(usethis:::rstudio_config_path("rstudio-prefs.json")),
-    "default_encoding",
-    .default = getOption("encoding")
-  )
 }
 
 
