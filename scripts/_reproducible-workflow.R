@@ -127,7 +127,12 @@ if (file.exists(rplots_path)) {
 ###############################################################################|
 ## R session information -------------------------------------------------------
 ###############################################################################|
-workflow_session <- sessioninfo::session_info() %>% print()
+si_log <- "scripts/logs/_reproducible-workflow_session-info.log" %>% 
+  here::here() %>%  ## expand to full path
+  build_path()      ## create "scripts/logs/" directory (if it doesn't exist)
+
+## save reproducible workflow session information to file and print to console
+sessioninfo::session_info(to_file = si_log) %>% print()
 
 
 ###############################################################################|
