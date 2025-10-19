@@ -1,8 +1,121 @@
-# github-qc-review-example
-GitHub-based QC review example repository.
+# GitHub QC Review Example Repository
+
+A comprehensive example repository demonstrating the [GitHub-based QC Review Workflow for Pharmacometrics Projects](ttps://github.com/user-attachments/assets/48d87a1f-baa7-4838-a791-7a6796a8c824) presented at ACoP 2025. This repository includes fully reproducible example code for a population pharmacokinetic modeling project, which is QC reviewed to illustrate the details of the process. 
+
+## Example QC Review
+
+The example GitHub-based QC review process is demonstrated in this [pull request](https://github.com/ilinsmeier-arcus/github-qc-review-example/pull/4). 
+
+The repo's [git history graph](https://github.com/ilinsmeier-arcus/github-qc-review-example/network) provides a high-level overview of the QC review branching strategy utilized for this process. The git history has also been carefully constructed to reflect a typical PMX project workflow.
 
 
-## Reproducible Workflow Session Information
+### QC Review Roles
+- Analyst: [`ilinsmeier-arcus`](https://github.com/ilinsmeier-arcus)
+- QC Reviewer: [`ilinsmeier`](https://github.com/ilinsmeier)
+
+
+### Additional Features
+
+This example QC review demonstrates some additional key features not previously discussed in the [ACoP 2025 poster](https://github.com/user-attachments/assets/48d87a1f-baa7-4838-a791-7a6796a8c824):
+- QC review specification in the PR description
+- 4 types of QC review comments (note, suggestion, question, and change request)
+- Response and resolution for each type of review comment
+- Reviewer summary of QC review methodology and findings
+
+
+<!-- ### ACoP 2025 Poster
+<img width="14400" height="19200" alt="ACoP 2025 Poster" src="https://github.com/user-attachments/assets/48d87a1f-baa7-4838-a791-7a6796a8c824" /> -->
+
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Before running the example project, ensure you have the required software installed:
+
+- **R** (≥ 4.0.0) with required packages - see [Session Information](#session-information) for package versions
+- **RTools** (R-version specific) - Windows only
+- **NONMEM** (≥ 7.4.0) - optional, for population modeling step (can be skipped)
+- **Perl speaks NONMEM (PsN)** (≥ 5.2.0) - optional, for population modeling step (can be skipped)
+- **Git** - for version control
+
+
+<!-- For detailed installation instructions, see [`SOFTWARE_DEPENDENCIES.md`](SOFTWARE_DEPENDENCIES.md) -->
+
+### Running the Example Project
+
+1. **Clone the repository**
+
+2. **Open the R project in RStudio**
+
+3. **Execute Reproducible Workflow**:
+   
+   The entire analysis workflow can be executed with a single command (all required packages will be installed automatically):
+
+   ```r
+   ## Run from project root directory
+   source("scripts/_reproducible-workflow.R")
+   ```
+
+   **NOTE**: The example workflow is intended to work on both Windows and Unix systems, but it has only been tested on Windows at this time. 
+
+
+   **The reproducible workflow script automatically executes all analysis steps in sequence**:
+   1. Package installation and setup
+   2. Exploratory data analysis
+   3. NONMEM model execution (optional - can be skipped if NONMEM/PsN not installed)
+   4. Model parameter table generation
+   5. Model diagnostic plots
+
+   **Expected runtime**: ~2 minutes 
+
+   
+
+
+<!-- ## 🗂️ Repository Structure
+
+```
+├── data/                          # Source datasets
+├── docs/                          # Documentation and QC templates  
+│   └── PULL_REQUEST_TEMPLATE/     # Preliminary QC Review PR templates
+├── graphs/                        # Generated plots and figures
+│   ├── eda/                       # Exploratory data analysis plots
+│   ├── gof/                       # Goodness-of-fit plots
+│   └── vpc/                       # Visual predictive checks
+├── nm/                            # NONMEM model files
+│   ├── base/                      # Base model development
+│   ├── cov/                       # Covariate model building
+│   └── final/                     # Final model files
+├── R/                             # R helper functions
+├── scripts/                       # Analysis scripts
+├── tables/                        # Generated summary tables
+└── reference/                     # Literature and reference materials
+``` -->
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open a pull request to contribute to this example repository.
+
+## 🔗 References
+
+**Example Dataset and Model Source**:
+- Bauer, R.J. (2019). NONMEM Tutorial Part I: Description of Commands and Options, With Simple Examples of Population Analysis. *CPT Pharmacometrics Syst. Pharmacol.*, 8, 525–537. doi:[10.1002/psp4.12404](https://doi.org/10.1002/psp4.12404)
+
+**Additional References**:
+- NONMEM Users Guide: https://www.iconplc.com/innovation/nonmem/
+- PsN Documentation: https://uupharmacometrics.github.io/PsN/
+- tidyverse Documentation: https://www.tidyverse.org/
+
+---
+
+
+*This repository was developed as an educational resource for pharmacometric QC workflows and GitHub-based collaboration.*
+
+
+## Session Information
+
+Session information generated by the reproducible workflow script: `scripts/_reproducible-workflow.R`.
+
 ```
 ─ Session info ──────────────────────────────────────────────────────────────────────────────────
  setting  value
@@ -73,3 +186,4 @@ GitHub-based QC review example repository.
 
 ─────────────────────────────────────────────────────────────────────────────────────────────────
 ```
+
