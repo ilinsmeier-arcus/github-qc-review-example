@@ -1,6 +1,6 @@
 # GitHub QC Review Example Repository
 
-A comprehensive example repository demonstrating the [GitHub-based QC Review Workflow for Pharmacometrics Projects](ttps://github.com/user-attachments/assets/48d87a1f-baa7-4838-a791-7a6796a8c824) presented at ACoP 2025. This repository includes fully reproducible example code for a population pharmacokinetic modeling project, which is QC reviewed to illustrate the details of the process. 
+A comprehensive example repository demonstrating the [GitHub-based QC Review Workflow for Pharmacometrics Projects](https://github.com/user-attachments/assets/48d87a1f-baa7-4838-a791-7a6796a8c824) presented at ACoP 2025. This repository includes fully reproducible example code for a population pharmacokinetic modeling project, which is QC reviewed to illustrate the details of the process. 
 
 ## Example QC Review
 
